@@ -66,3 +66,4 @@ Roster assignment by Folder at Tj's direction, from the 2026-11-02 Google Play n
 
 - **2026-10-29** — Shell created (README.md + this HANDOFF.md). Awaiting project assignment from Tj.
 - **2026-11-02** — ASSIGNED: Night Shift: Laundromat (roster #7). Full build brief installed above by Folder. Build priority #7 in the roster sequence.
+- **2026-11-02** — GitHub Pages ENABLED (workflow deploy, standard static workflow added at .github/workflows/pages.yml). Site: https://taugustincst.github.io/project-shell-07/ — until the game is built, this serves the repo files (README/HANDOFF); the shipped game + privacy.html deploy from this same root.
