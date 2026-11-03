@@ -15,13 +15,15 @@
 <p>Night Shift: Laundromat ("the Game") is published by AugustInnovations LLC ("we", "us"). This policy explains what information the Game handles.</p>
 
 <h2>Information we collect</h2>
-<p>None. The Game does not collect, transmit, sell, or share any personal information. It has no accounts, no analytics, no advertising SDKs, and no third-party tracking.</p>
+<p>The Game has no accounts, no analytics, no advertising SDKs and no third-party tracking, and it does not sell or share any information. The one thing it sends anywhere is described under Purchases below: the details Google Play gives it after a purchase, so the purchase can be confirmed.</p>
 
 <h2>Data stored on your device</h2>
 <p>The Game saves your progress (the current fortnight, the current night, settings, endings seen, and whether the one-time unlock has been bought) in your device's local browser storage so you can pick up where you left off. This data never leaves your device. Clearing the app's data or uninstalling the app removes it.</p>
 
 <h2>Purchases</h2>
 <p>On Google Play, the Game offers one optional one-time purchase that opens nights 4 to 14. The purchase is handled entirely by Google Play Billing; the Game never sees your payment details. Restoring the purchase on another device asks Google Play whether your Google account owns it.</p>
+
+<p>After a purchase on Google Play, the Game sends the purchase's details from Google Play (the app's package name, which item was bought and Google Play's purchase token) over an encrypted connection to a small service of ours on Google Cloud. That service asks Google Play to confirm and acknowledge the purchase, which Google Play requires, and keeps nothing afterwards. Until that check succeeds, the token waits in the Game's own storage on your device. The details identify the purchase, not you: no name, email address or payment details are sent.</p>
 
 <h2>Network access</h2>
 <p>The Game is delivered as a web application from <code>taugustincst.github.io</code>. Loading or updating the Game downloads its files from that host, which is served by GitHub Pages. GitHub's handling of standard server logs is described in <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">GitHub's privacy statement</a>. After the first load, the Game is cached and playable offline.</p>
