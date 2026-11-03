@@ -33,7 +33,7 @@ Run the night shift. Follow the rules. The rules keep changing.
 Game · Simulation. Tags: horror, management, story, night shift, offline.
 
 ## Declarations (to confirm in Console)
-- IARC: horror themes and mild dread in text; no violence, gore, sexual content or gambling; no user interaction; no ads; one in-app purchase.
+- Price: paid download, suggested $4.99 (set in Play Console)
+- IARC: horror themes and mild dread in text; no violence, gore, sexual content or gambling; no user interaction; no ads; in-app purchases: none.
 - Target audience: 16-17 and 18+ only. Not for children.
-- Data safety (Play edition): collects one data type, shares nothing. Financial info > Purchase history: collected yes, shared no, processed ephemerally yes, required, purpose App functionality. After a purchase the game sends the package name, product ID and Play purchase token over HTTPS to the acknowledgement service (the one in the fftremake repository's ack-endpoint folder), which checks it with Google Play and acknowledges it; nothing is kept on the server. Encrypted in transit: yes. Deletion: nothing is kept on the server; progress is removed by uninstalling or clearing the app's data. Privacy policy at this repo's Pages site, privacy.html. Contact elderon@augustinnovations.io.
-- In-app product: `full_unlock`, non-consumable, $4.99, title "Nights 4 to 14", description "Opens nights four to fourteen and every ending."
+- Data safety: no data collected, no data shared, no network access; progress stays on the device. Privacy policy at this repo's Pages site, privacy.html. Contact elderon@augustinnovations.io.

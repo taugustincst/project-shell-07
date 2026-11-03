@@ -17,7 +17,6 @@ jobs:
         with:
           node-version: 22
       - run: node tests/engine.test.js
-      - run: node tests/billing.test.js
       - run: node sim/sim.js 200 1
       - run: npm install --no-audit --no-fund
       - run: npx playwright install --with-deps chromium

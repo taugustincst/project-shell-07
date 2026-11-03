@@ -1,23 +1,19 @@
 /* Night Shift: Laundromat — UI, save, wiring. The simulation lives in engine.js. */
 (function () {
 'use strict';
-const E = window.LM, D = E.D, B = window.LM_BILLING;
+const E = window.LM, D = E.D;
 const VERSION = '1.0.0', SAVE_KEY = 'laundromat.v1', BACKUP_KEY = 'laundromat.v1.backup';
 const $ = id => document.getElementById(id);
-// ?dev=1 makes unlocking free for testing. Only on a local copy: the Play app opens the public site, and
-// the free unlock would otherwise be one link away for anyone and saved on their phone.
-const DEV = new URLSearchParams(location.search).get('dev') === '1' && ['localhost', '127.0.0.1', ''].includes(location.hostname);
 let S = null, profile = null;
 
-function freshMeta() { return { unlocked: false, endings: {}, fortnights: 0 }; }
-function sanitizeMeta(m) { m = (m && typeof m === 'object') ? m : {}; const out = freshMeta(); out.unlocked = m.unlocked === true; out.fortnights = Math.min(9999, Math.max(0, Math.round(+m.fortnights || 0))); if (m.endings && typeof m.endings === 'object') for (const k in m.endings) if (D.ENDINGS[k]) out.endings[k] = 1; return out; }
+function freshMeta() { return { endings: {}, fortnights: 0 }; }
+function sanitizeMeta(m) { m = (m && typeof m === 'object') ? m : {}; const out = freshMeta(); out.fortnights = Math.min(9999, Math.max(0, Math.round(+m.fortnights || 0))); if (m.endings && typeof m.endings === 'object') for (const k in m.endings) if (D.ENDINGS[k]) out.endings[k] = 1; return out; }
 function load() {
   let raw = null;
   try { raw = JSON.parse(localStorage.getItem(SAVE_KEY)); } catch (e) { try { localStorage.setItem(BACKUP_KEY, localStorage.getItem(SAVE_KEY) || ''); } catch (e2) { } }
   profile = { meta: sanitizeMeta(raw && raw.meta), settings: { large: !!(raw && raw.settings && raw.settings.large), contrast: !!(raw && raw.settings && raw.settings.contrast) }, snapshot: (raw && raw.snapshot && typeof raw.snapshot === 'object') ? raw.snapshot : null };
   S = raw && raw.run ? E.sanitize(raw.run) : null;
-  if (!S) { S = E.newState({ unlocked: profile.meta.unlocked }); profile.snapshot = JSON.parse(JSON.stringify(S)); }
-  if (profile.meta.unlocked && !S.unlocked) E.unlock(S);
+  if (!S) { S = E.newState(); profile.snapshot = JSON.parse(JSON.stringify(S)); }
 }
 function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify({ v: 1, run: S, meta: profile.meta, settings: profile.settings, snapshot: profile.snapshot })); } catch (e) { } }
 function snapshot() { profile.snapshot = JSON.parse(JSON.stringify(S)); save(); }
@@ -45,7 +41,6 @@ function render() {
   for (const id of ['btn-mop', 'btn-rest', 'btn-wait', 'btn-camera', 'btn-log', 'btn-restock', 'btn-change']) $(id).disabled = busy && id !== 'btn-wait' ? true : (id === 'btn-wait' ? (!!S.pendingEvent || S.phase !== 'night') : false);
   if (S.backroom > 0) $('btn-wait').disabled = false;
   $('btn-restock').disabled = busy || S.cash < E.DET_COST; $('btn-change').disabled = busy || S.cash < 10;
-  $('unlock-card').hidden = S.unlocked;
   showModals();
 }
 function show(id) { $(id).hidden = false; } function hide(id) { $(id).hidden = true; }
@@ -60,13 +55,12 @@ function showModals() {
     else { const e = E.eventDef(S); const who = e.who ? D.REGULARS.find(r => r.id === e.who) : null; $('ev-when').textContent = E.clock(S.t) + (who ? ' · ' + who.name : ''); $('ev-title').textContent = e.title || (who ? who.name : ''); $('ev-text').textContent = e.text;
       const box = $('ev-choices'); box.innerHTML = ''; E.eventChoices(S).forEach((c, i) => { const b = document.createElement('button'); b.className = 'btn'; b.textContent = c.label; b.onclick = () => { E.resolveEvent(S, i); save(); render(); }; box.appendChild(b); }); show('modal-event'); }
   } else hide('modal-event');
-  // ledger / gate / ending
+  // ledger / ending
   if (S.phase === 'ledger') {
     const L = S.ledgers[S.ledgers.length - 1]; $('ld-title').textContent = `Night ${L.night}`; const rulesText = L.broken.length ? L.broken.map(n => 'Rule ' + n).join(', ') + ' broken' : 'All rules kept';
     $('ld-body').innerHTML = [['Takings after the owner\'s cut', money(L.cashDelta)], ['Till', money(S.cash)], ['Steady', Math.round(L.sanity)], ['Rules', rulesText], ['Served', L.served], ['Nobody loaded', S.stats.phantoms]].map(p => `<div><b>${p[1]}</b><span>${p[0]}</span></div>`).join('');
     $('ld-unwritten').textContent = '— ' + L.unwritten; show('modal-ledger');
   } else hide('modal-ledger');
-  if (S.phase === 'gate') { $('gate-note').textContent = DEV ? 'Test build: unlocking is free here.' : ''; show('modal-gate'); } else hide('modal-gate');
   if (S.phase === 'ended') {
     const en = D.ENDINGS[S.ended]; if (!profile.meta.endings[S.ended]) { profile.meta.endings[S.ended] = 1; profile.meta.fortnights++; save(); }
     $('en-k').textContent = `Night ${S.night} · ending ${Object.keys(profile.meta.endings).length} of ${Object.keys(D.ENDINGS).length} found`; $('en-title').textContent = en.title; $('en-text').textContent = en.text;
@@ -90,10 +84,7 @@ function machineSheet(id) {
 }
 function serveTop(i) { const c = S.queue[i]; if (!c) return; if (!E.serve(S, i)) { toast(c.note && S.coins < 2 ? 'No coins to break their note. Get coins first.' : 'No washer free. Unload one.'); } save(); render(); }
 
-function grantUnlock(src) { profile.meta.unlocked = true; E.unlock(S); snapshot(); render(); toast(src === 'restore' ? 'Purchase restored.' : 'Nights 4 to 14 are yours.'); }
-async function doUnlock() { if (S.unlocked) return toast('Already unlocked.'); if (DEV) return grantUnlock('dev'); const r = await B.unlock(); if (r.ok) grantUnlock('buy'); else if (r.reason === 'unavailable') toast('Unlocking is available in the Google Play version.'); else if (r.reason === 'cancelled') toast('No purchase made.'); else toast('The purchase could not be completed.'); }
-async function doRestore() { const r = await B.restore(); if (r.ok) grantUnlock('restore'); else if (r.reason === 'unavailable') toast('Restore is available in the Google Play version.'); else toast('No purchase found for this Google account.'); }
-function newFortnight() { S = E.newState({ unlocked: profile.meta.unlocked }); snapshot(); render(); }
+function newFortnight() { S = E.newState(); snapshot(); render(); }
 function restartNight() { if (!profile.snapshot) return; const r = E.sanitize(profile.snapshot); if (!r) return; S = r; if (S.phase !== 'night') { S.phase = 'night'; } save(); render(); toast(`Night ${S.night}, eleven o'clock.`); }
 
 function applySettings() { document.documentElement.classList.toggle('large', profile.settings.large); document.documentElement.classList.toggle('contrast', profile.settings.contrast); $('opt-large').checked = profile.settings.large; $('opt-contrast').checked = profile.settings.contrast; }
@@ -118,18 +109,16 @@ function init() {
   $('btn-restart-night').addEventListener('click', () => { hide('modal-more'); restartNight(); });
   $('btn-reset').addEventListener('click', () => { if (confirm('Start the fortnight again from night one?')) { hide('modal-more'); newFortnight(); } });
   $('btn-again').addEventListener('click', newFortnight); $('btn-restart-last').addEventListener('click', restartNight);
-  $('btn-gate-replay').addEventListener('click', newFortnight);
-  for (const id of ['btn-unlock', 'btn-unlock2']) $(id).addEventListener('click', doUnlock); for (const id of ['btn-restore', 'btn-restore2']) $(id).addEventListener('click', doRestore);
   for (const k of ['large', 'contrast']) $('opt-' + k).addEventListener('change', e => { profile.settings[k] = e.target.checked; applySettings(); save(); });
   window.addEventListener('pagehide', save); document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(); });
   $('app').hidden = false; render();
   if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => { });
 }
 window.__laundromat = { get state() { return S; }, E, D, VERSION,
-  setNight(n, t) { S.night = Math.max(1, Math.min(D.NIGHTS, n | 0)); E.beginNight(S); S.pendingEvent = null; S.t = Math.max(0, Math.min(D.TICKS - 1, t | 0)); S.unlocked = true; render(); },
+  setNight(n, t) { S.night = Math.max(1, Math.min(D.NIGHTS, n | 0)); E.beginNight(S); S.pendingEvent = null; S.t = Math.max(0, Math.min(D.TICKS - 1, t | 0)); render(); },
   give(o) { for (const k of ['cash', 'sanity', 'power', 'det', 'coins']) if (o[k] != null) S[k] = +o[k]; if (o.wet != null) S.wet = !!o.wet; render(); },
   forceEvent(id) { const e = D.SPINE.find(x => x.id === id) ? 'spine' : D.MINOR.find(x => x.id === id) ? 'minor' : null; if (!e) return false; S.pendingEvent = { kind: e, id }; render(); return true; },
   customer(c) { S.queue.push(Object.assign({ name: 'someone', det: false, note: false, free: false, regular: false, patience: 3, machine: null }, c || {})); render(); },
-  wait(n) { for (let i = 0; i < (n || 1); i++) E.wait(S); render(); }, endNight() { E.endNight(S); render(); }, unlock() { grantUnlock('dev'); }, save, snapshot, render, reset() { localStorage.removeItem(SAVE_KEY); location.reload(); } };
+  wait(n) { for (let i = 0; i < (n || 1); i++) E.wait(S); render(); }, endNight() { E.endNight(S); render(); }, save, snapshot, render, reset() { localStorage.removeItem(SAVE_KEY); location.reload(); } };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

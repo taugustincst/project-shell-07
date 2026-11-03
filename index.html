@@ -70,13 +70,6 @@
   <div class="row-btns"><button class="btn primary" id="btn-next-night">Next night</button><button class="btn" id="btn-ledger-restart">Do this night again</button></div>
 </div></div>
 
-<div class="modal" id="modal-gate" hidden role="dialog" aria-modal="true"><div class="sheet">
-  <div class="sheet-k">Night 4</div><h2>The rules keep changing</h2>
-  <p>Three nights. Three rules. You know the regulars now, and the hum, and which floor tile is loose. Nights four to fourteen, the rest of the sheet, and every ending are one purchase.</p>
-  <div class="row-btns"><button class="btn primary" id="btn-unlock">Unlock nights 4–14</button><button class="btn" id="btn-restore">Restore purchase</button><button class="btn" id="btn-gate-replay">Start the fortnight again</button></div>
-  <p class="muted small" id="gate-note"></p>
-</div></div>
-
 <div class="modal" id="modal-ending" hidden role="dialog" aria-modal="true"><div class="sheet">
   <div class="sheet-k" id="en-k"></div><h2 id="en-title"></h2><p id="en-text"></p><div class="ledger" id="en-stats"></div>
   <div class="row-btns"><button class="btn primary" id="btn-again">Start a new fortnight</button><button class="btn" id="btn-restart-last">Do the last night again</button></div>
@@ -86,13 +79,12 @@
   <h2>More</h2>
   <label class="row"><input type="checkbox" id="opt-large"> Large text</label>
   <label class="row"><input type="checkbox" id="opt-contrast"> High contrast</label>
-  <div class="card" id="unlock-card"><p>Nights 1–3 are free. One purchase opens nights 4–14 and every ending.</p><div class="row-btns"><button class="btn primary" id="btn-unlock2">Unlock nights 4–14</button><button class="btn" id="btn-restore2">Restore purchase</button></div></div>
   <div class="row-btns"><button class="btn" id="btn-restart-night">Restart this night</button><button class="btn danger" id="btn-reset">Start the fortnight again</button></div>
   <p class="muted small">Night Shift: Laundromat is a systems-horror management game. No ads, no accounts, fully offline. Progress is saved on this device at the start of each night. Version <span id="about-version"></span> · <a href="privacy.html">Privacy</a> · © AugustInnovations LLC</p>
   <button class="btn" id="btn-more-close">Close</button>
 </div></div>
 
 <div id="toast" class="toast" hidden></div>
-<script src="js/data.js"></script><script src="js/engine.js"></script><script src="js/billing.js"></script><script src="js/game.js"></script>
+<script src="js/data.js"></script><script src="js/engine.js"></script><script src="js/game.js"></script>
 </body>
 </html>

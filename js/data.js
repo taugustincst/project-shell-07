@@ -2,7 +2,7 @@
 (function (root) {
 'use strict';
 
-const NIGHTS = 14, FREE_NIGHTS = 3, TICKS = 21, TICK_MIN = 20; // 23:00 + 21×20min = 06:00
+const NIGHTS = 14, TICKS = 21, TICK_MIN = 20; // 23:00 + 21×20min = 06:00
 const PRICES = [3, 4, 5];
 
 const MACHINES = [
@@ -202,6 +202,6 @@ const ENDINGS = {
   closing: { title: 'Closing Time', text: 'Two weeks after your last night the laundromat closes. A notice on the door, apologies for the inconvenience, the nearest alternative is across town. You go past it once at eleven. The lights are off. The machines are running.' }
 };
 
-const DATA = { NIGHTS, FREE_NIGHTS, TICKS, TICK_MIN, PRICES, MACHINES, RULES, REGULARS, SPINE, MINOR, UNWRITTEN, ENDINGS };
+const DATA = { NIGHTS, TICKS, TICK_MIN, PRICES, MACHINES, RULES, REGULARS, SPINE, MINOR, UNWRITTEN, ENDINGS };
 if (typeof module !== 'undefined' && module.exports) module.exports = DATA; else root.LM_DATA = DATA;
 })(typeof window !== 'undefined' ? window : globalThis);

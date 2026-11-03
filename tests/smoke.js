@@ -33,17 +33,16 @@ const settle = p => T(p, () => { const K = window.__laundromat; while (K.state.p
   check('the save restores night, time and till', JSON.stringify(before) === JSON.stringify(after), JSON.stringify(after));
   await settle(p); await p.click('#btn-more'); await p.click('#btn-restart-night'); await p.waitForTimeout(100);
   check('restart this night goes back to eleven of the same night', await T(p, () => window.__laundromat.state.night === 2 && window.__laundromat.state.t === 0));
-  // the gate
-  await T(p, () => { const K = window.__laundromat; K.state.unlocked = false; K.setNight(3, 20); K.state.unlocked = false; K.give({ cash: 200 }); K.state.pendingEvent = null; K.wait(1); });
-  await p.waitForSelector('#modal-ledger:not([hidden])'); await p.click('#btn-next-night'); await p.waitForSelector('#modal-gate:not([hidden])');
-  check('night four is behind the unlock', await T(p, () => window.__laundromat.state.phase === 'gate'));
-  await p.click('#btn-unlock'); await p.waitForTimeout(200); check('without Play Billing the unlock explains itself', await T(p, () => window.__laundromat.state.phase === 'gate' && !document.getElementById('toast').hidden));
-  await T(p, () => window.__laundromat.unlock()); check('unlock starts night four', await T(p, () => window.__laundromat.state.night === 4 && window.__laundromat.state.phase === 'night'));
+  // no gate: the whole fortnight is open
+  check('no purchase screen, unlock or restore button exists', await T(p, () => !['modal-gate', 'unlock-card', 'btn-unlock', 'btn-unlock2', 'btn-restore', 'btn-restore2', 'gate-note'].some(id => document.getElementById(id)) && !('LM_BILLING' in window) && !('unlock' in window.__laundromat) && !/restore purchase|unlock nights|google play/i.test(document.body.textContent)));
+  await T(p, () => { const K = window.__laundromat; K.setNight(3, 20); K.give({ cash: 200 }); K.state.pendingEvent = null; K.wait(1); });
+  await p.waitForSelector('#modal-ledger:not([hidden])'); await p.click('#btn-next-night'); await p.waitForTimeout(100);
+  check('night three leads straight into night four', await T(p, () => window.__laundromat.state.night === 4 && window.__laundromat.state.phase === 'night' && window.__laundromat.state.t === 0));
   // corrupt saves
-  for (const [label, junk] of [['truncated', '{"run":{"night":"zz"'], ['wrong types', '{"run":{"night":"zz","cash":"1e999","machines":"no"},"meta":{"unlocked":"yes"}}'], ['not an object', '3']]) {
+  for (const [label, junk] of [['truncated', '{"run":{"night":"zz"'], ['wrong types', '{"run":{"night":"zz","cash":"1e999","machines":"no"},"meta":{"unlocked":"yes"}}'], ['not an object', '3'], ['an old save stopped at the gate', '{"v":1,"run":{"night":4,"t":21,"phase":"gate","unlocked":false},"meta":{"unlocked":false}}']]) {
     const ctx = await b.newContext({ viewport: { width: 360, height: 740 } }); const q = await ctx.newPage(); const qe = []; q.on('pageerror', e => qe.push(e.message));
     await q.addInitScript(j => { try { localStorage.setItem('laundromat.v1', j); } catch (e) { } }, junk); await q.goto(base); await q.waitForSelector('#app:not([hidden])');
-    check('a mangled save still loads: ' + label, qe.length === 0 && await T(q, () => { const s = window.__laundromat.state; return s.night >= 1 && isFinite(s.cash) && s.unlocked === false; }), qe.join(' | ')); await ctx.close();
+    check('a mangled save still loads: ' + label, qe.length === 0 && await T(q, old => { const s = window.__laundromat.state; return s.night >= 1 && isFinite(s.cash) && s.unlocked === true && s.phase !== 'gate' && (old ? s.night === 4 && s.phase === 'night' && document.getElementById('modal-ledger').hidden : true); }, label.startsWith('an old save')), qe.join(' | ')); await ctx.close();
   }
   // an ending
   await T(p, () => { const K = window.__laundromat; K.setNight(14, 19); K.give({ cash: 300, sanity: 80 }); K.state.pendingEvent = null; K.wait(1); K.E.resolveEvent(K.state, 0); K.wait(1); K.render(); });

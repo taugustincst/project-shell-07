@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Full screen from the first frame, in the game's own background colour. -->
+    <style name="AppTheme" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowBackground">@color/nightshift_bg</item>
+        <item name="android:statusBarColor">@color/nightshift_bg</item>
+        <item name="android:navigationBarColor">@color/nightshift_bg</item>
+    </style>
+</resources>

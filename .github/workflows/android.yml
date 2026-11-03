@@ -1,13 +1,14 @@
 name: Android
-# The Play edition (android/play): build it, check every class the manifest
-# names is in the dex, and open it on an emulator to see that it does not
-# crash. Play rejected Ironhold's generated wrapper on 1 Nov 2026 for
-# crashing at launch; a red run here is a build that must not be uploaded.
+# The Play edition (android/play): the whole game in a paid app. Build it,
+# check every class the manifest names is in the dex and every file the page
+# needs is in the assets, then open it on an emulator and fail unless the
+# game's page actually loads. A red run here is a build that must not be
+# uploaded.
 on:
   push:
-    paths: ['android/**', 'tools/check-apk.js', 'tools/launch-test.sh', '.github/workflows/android.yml']
+    paths: ['android/**', 'index.html', '*.css', 'js/**', 'icons/**', 'manifest.webmanifest', 'privacy.html', 'tools/check-apk.js', 'tools/launch-test.sh', '.github/workflows/android.yml']
   pull_request:
-    paths: ['android/**', 'tools/check-apk.js', 'tools/launch-test.sh', '.github/workflows/android.yml']
+    paths: ['android/**', 'index.html', '*.css', 'js/**', 'icons/**', 'manifest.webmanifest', 'privacy.html', 'tools/check-apk.js', 'tools/launch-test.sh', '.github/workflows/android.yml']
   workflow_dispatch:
 permissions:
   contents: read

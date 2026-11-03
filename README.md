@@ -2,7 +2,7 @@
 
 **Systems horror, no jump scares.** You run a 24-hour laundromat, 11pm to 6am, fourteen nights, in a town where the regulars are off. Manage machines, stock, change and a power budget while the horror arrives through the systems themselves: a cycle that finished itself, a log entry with nobody on camera, and a rule sheet that gains a rule every night.
 
-Free on Google Play (nights 1–3) with a one-time $4.99 unlock. No ads, no consumables, fully offline.
+A paid download on Google Play: the whole fortnight is in the app, with no in-app purchases. No ads, no consumables, fully offline.
 
 Status: **v1.0.0 draft built 2026-11-03**, not submitted. Brief and log in [HANDOFF.md](HANDOFF.md); plan and verification in `tasks/todo.md`.
 
@@ -20,8 +20,7 @@ Status: **v1.0.0 draft built 2026-11-03**, not submitted. Brief and log in [HAND
 | --- | --- |
 | `js/data.js` | Rules, regulars, spine beats, minor events, endings. Data only. |
 | `js/engine.js` | Deterministic shop simulation (seeded RNG), no DOM. Runs in Node. |
-| `js/game.js` | UI, save, test API `window.__laundromat` (`setNight`, `give`, `forceEvent`, `customer`, `wait`, `unlock`). `?dev=1` makes the unlock free in test builds. |
-| `js/billing.js` | Play Billing via the Digital Goods API, product `full_unlock`. |
+| `js/game.js` | UI, save, test API `window.__laundromat` (`setNight`, `give`, `forceEvent`, `customer`, `wait`, `endNight`). |
 | `sim/sim.js` | Headless fortnight simulator: three attendants × N seeds, survival and ending distribution. |
 | `tests/engine.test.js`, `tests/smoke.js` | Unit tests and a Playwright smoke test over `file://`. |
 
@@ -39,4 +38,4 @@ node tests/engine.test.js && node sim/sim.js 200 1 && node tests/smoke.js
 The owner's nightly cut is the lever that makes cash losable; steadiness is losable by anyone who takes the money.
 
 ## Publishing
-Trusted Web Activity, the Ironhold pattern (Android project not yet in this repo). Pages deploys from `main`; privacy policy at `privacy.html`; store copy in `store/listing.md`.
+A paid app on Google Play with the whole game packed inside it (`android/play`, see `PLAY.md`). Pages deploys only the store page from `main` (`site/index.html`, the privacy policy `privacy.html` and the store graphics), not the playable game. Store copy: `store/listing.md`.

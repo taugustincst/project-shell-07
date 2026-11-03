@@ -2,7 +2,7 @@
 (function (root) {
 'use strict';
 const D = (typeof LM_DATA !== 'undefined') ? LM_DATA : require('./data.js');
-const { NIGHTS, FREE_NIGHTS, TICKS, PRICES } = D;
+const { NIGHTS, TICKS, PRICES } = D;
 const START_CASH = 40, START_SANITY = 100, POWER_PER_NIGHT = 60, OWNER_CUT = 42, DET_COST = 8, REPAIR_COST = 15;
 const WASH_TICKS = 2, DRY_TICKS = 2, WASHER_DRAW = 1, DRYER_DRAW = 2, DRYER_PRICE = 2, DET_PRICE = 1.5;
 const LOG_CAP = 400;
@@ -18,7 +18,7 @@ function newState(opts) {
     cash: START_CASH, sanity: START_SANITY, power: POWER_PER_NIGHT, det: 10, coins: 20, wet: true, price: 1,
     machines: freshMachines(), queue: [], log: [], entries: [], camera: null, rules: {}, flags: {}, pendingEvent: null, fired: {}, lastMinor: -9, backroom: 0,
     moppedTonight: false, w4Broken: false, logBroken: false, dark: false, darkEvent: false,
-    nightStart: { cash: START_CASH, sanity: START_SANITY }, ledgers: [], unlocked: !!opts.unlocked, ended: null,
+    nightStart: { cash: START_CASH, sanity: START_SANITY }, ledgers: [], unlocked: true, ended: null,
     stats: { served: 0, lost: 0, phantoms: 0, cycles: 0, rests: 0, mops: 0, jams: 0 } };
   beginNight(s);
   return s;
@@ -193,10 +193,8 @@ function finish(s, id) { if (s.ended) return; s.ended = id; s.phase = 'ended'; s
 function nextNight(s) {
   if (s.phase !== 'ledger' || s.ended) return false;
   s.night++;
-  if (s.night > FREE_NIGHTS && !s.unlocked) { s.phase = 'gate'; return true; }
   beginNight(s); return true;
 }
-function unlock(s) { s.unlocked = true; if (s.phase === 'gate') beginNight(s); }
 function restartNight(s, snap) { if (!snap) return false; const r = sanitize(snap); if (!r) return false; Object.assign(s, r); return true; }
 function score(s) { return Math.round(s.cash * 2 + s.sanity + keptCount(s) * 10 + s.stats.served); }
 
@@ -204,9 +202,9 @@ function score(s) { return Math.round(s.cash * 2 + s.sanity + keptCount(s) * 10 
 const num = (v, def, lo, hi) => { v = +v; if (!isFinite(v)) v = def; return Math.min(hi, Math.max(lo, v)); };
 function sanitize(raw) {
   if (!raw || typeof raw !== 'object') return null;
-  const s = newState({ seed: raw.seed, unlocked: raw.unlocked === true });
+  const s = newState({ seed: raw.seed });
   s.night = Math.round(num(raw.night, 1, 1, NIGHTS)); s.t = Math.round(num(raw.t, 0, 0, TICKS));
-  s.phase = ['night', 'ledger', 'ended', 'gate'].includes(raw.phase) ? raw.phase : 'night';
+  s.phase = ['night', 'ledger', 'ended'].includes(raw.phase) ? raw.phase : 'night';
   s.cash = num(raw.cash, START_CASH, -1000, 1e6); s.sanity = num(raw.sanity, START_SANITY, 0, 100); s.power = num(raw.power, POWER_PER_NIGHT, 0, 200);
   s.det = Math.round(num(raw.det, 10, 0, 999)); s.coins = Math.round(num(raw.coins, 20, 0, 9999)); s.wet = raw.wet === true; s.price = Math.round(num(raw.price, 1, 0, PRICES.length - 1));
   s.machines = freshMachines(); if (Array.isArray(raw.machines)) for (const m of s.machines) { const r = raw.machines.find(x => x && x.id === m.id); if (r) { m.state = ['idle', 'running', 'done', 'jammed', 'broken'].includes(r.state) ? r.state : 'idle'; m.rem = Math.round(num(r.rem, 0, 0, 5)); m.phantom = r.phantom === true; m.player = r.player === true; m.cust = typeof r.cust === 'string' ? r.cust.slice(0, 60) : null; } }
@@ -224,10 +222,11 @@ function sanitize(raw) {
   s.ledgers = Array.isArray(raw.ledgers) ? raw.ledgers.filter(l => l && typeof l === 'object').slice(0, NIGHTS).map(l => ({ night: Math.round(num(l.night, 1, 1, NIGHTS)), cashDelta: num(l.cashDelta, 0, -1e6, 1e6), sanity: num(l.sanity, 0, 0, 100), broken: Array.isArray(l.broken) ? l.broken.map(Number).filter(n => n >= 1 && n <= NIGHTS) : [], served: Math.round(num(l.served, 0, 0, 1e6)), unwritten: String(l.unwritten || '').slice(0, 200) })) : [];
   s.ended = D.ENDINGS[raw.ended] ? raw.ended : null; if (s.ended) s.phase = 'ended';
   if (raw.stats && typeof raw.stats === 'object') for (const k in s.stats) s.stats[k] = Math.round(num(raw.stats[k], 0, 0, 1e6));
-  if (s.phase === 'gate' && s.unlocked) beginNight(s);
+  // Older saves could stop between nights at a 'gate' phase; every night is open, so that night simply begins.
+  if (raw.phase === 'gate' && !s.ended) beginNight(s);
   return s;
 }
 
-const ENGINE = { D, START_CASH, START_SANITY, POWER_PER_NIGHT, OWNER_CUT, DET_COST, REPAIR_COST, DET_PRICE, DRYER_PRICE, rand, clock, newState, beginNight, rulesSoFar, brokenCount, keptCount, eventDef, eventChoices, resolveEvent, resolveDark, serve, turnAway, unload, stop, fix, repair, restock, getChange, setPrice, readLog, checkCamera, mop, rest, wait, advance, endNight, nextNight, unlock, restartNight, finalEnding, score, sanitize, pushLog, machine, freeWasher, freeDryer };
+const ENGINE = { D, START_CASH, START_SANITY, POWER_PER_NIGHT, OWNER_CUT, DET_COST, REPAIR_COST, DET_PRICE, DRYER_PRICE, rand, clock, newState, beginNight, rulesSoFar, brokenCount, keptCount, eventDef, eventChoices, resolveEvent, resolveDark, serve, turnAway, unload, stop, fix, repair, restock, getChange, setPrice, readLog, checkCamera, mop, rest, wait, advance, endNight, nextNight, restartNight, finalEnding, score, sanitize, pushLog, machine, freeWasher, freeDryer };
 if (typeof module !== 'undefined' && module.exports) module.exports = ENGINE; else root.LM = ENGINE;
 })(typeof window !== 'undefined' ? window : globalThis);
