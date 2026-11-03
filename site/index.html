@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Night Shift: Laundromat</title>
+  <meta name="description" content="Run the night shift. Follow the rules. The rules keep changing.">
+  <meta name="theme-color" content="#0e0f12">
+  <link rel="icon" href="img/icon-192.png">
+  <meta property="og:title" content="Night Shift: Laundromat">
+  <meta property="og:description" content="Run the night shift. Follow the rules. The rules keep changing.">
+  <meta property="og:image" content="img/feature-graphic-1024x500.png">
+  <style>
+    :root { --bg: #0e0f12; --fg: #f4efe6; --muted: #c9c1b4; --panel: rgba(255,255,255,0.06); }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--fg);
+      font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; }
+    .hero img { display: block; width: 100%; height: auto; border-radius: 12px; }
+    header { display: flex; gap: 16px; align-items: center; margin: 24px 0 8px; }
+    header img { width: 72px; height: 72px; border-radius: 16px; }
+    h1 { margin: 0; font-size: 1.8rem; line-height: 1.2; }
+    .short { margin: 4px 0 0; color: var(--muted); }
+    .get { display: inline-block; margin: 20px 0 8px; padding: 12px 22px; border-radius: 999px;
+      background: var(--fg); color: var(--bg); font-weight: 600; text-decoration: none; }
+    .get:focus-visible, .get:hover { outline: 3px solid var(--muted); outline-offset: 2px; }
+    .note { margin: 0 0 24px; color: var(--muted); font-size: 0.9rem; }
+    .shots { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(180px, 220px);
+      gap: 12px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory; }
+    figure { margin: 0; scroll-snap-align: start; }
+    figure img { display: block; width: 100%; height: auto; border-radius: 10px; }
+    figcaption { margin-top: 6px; font-size: 0.85rem; color: var(--muted); }
+    .about { margin-top: 28px; padding: 4px 20px; border-radius: 12px; background: var(--panel); }
+    footer { margin-top: 32px; font-size: 0.9rem; color: var(--muted); }
+    footer a { color: inherit; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="hero"><img src="img/feature-graphic-1024x500.png" alt="" width="1024" height="500"></div>
+    <header>
+      <img src="img/icon-192.png" alt="" width="72" height="72">
+      <div>
+        <h1>Night Shift: Laundromat</h1>
+        <p class="short">Run the night shift. Follow the rules. The rules keep changing.</p>
+      </div>
+    </header>
+    <a class="get" href="https://play.google.com/store/apps/details?id=com.taugustincst.nightshift">Get it on Google Play</a>
+    <p class="note">Night Shift: Laundromat is played in the Android app.</p>
+    <section class="shots" aria-label="Screenshots">
+        <figure><img src="img/screenshot-01-machines.png" alt="3am. Eight machines. One of them you did not load." loading="lazy" width="540" height="1170"><figcaption>3am. Eight machines. One of them you did not load.</figcaption></figure>
+        <figure><img src="img/screenshot-02-machine.png" alt="The rule sheet gains a rule every night" loading="lazy" width="540" height="1170"><figcaption>The rule sheet gains a rule every night</figcaption></figure>
+        <figure><img src="img/screenshot-03-counter.png" alt="Serve the regulars. Count the change twice." loading="lazy" width="540" height="1170"><figcaption>Serve the regulars. Count the change twice.</figcaption></figure>
+        <figure><img src="img/screenshot-04-rules.png" alt="Six endings, from the whole fortnight" loading="lazy" width="540" height="1170"><figcaption>Six endings, from the whole fortnight</figcaption></figure>
+    </section>
+    <section class="about">
+      <p><strong>11pm to 6am. Fourteen nights.</strong> You are the only attendant at a 24-hour laundromat in a town where the regulars are a little off. Keep eight machines turning, the floor dry, the soap stocked, the change drawer honest and the power budget alive until six.</p>
+      <p><strong>The rule sheet.</strong> The last attendant left a sheet by the register. It gains one rule every night. The rules are real: following them costs money or nerve; breaking them sometimes pays. Two of them cannot both be kept.</p>
+      <p><strong>Horror from the systems, not the dark.</strong> A cycle finishes that nobody loaded. A name appears in the entry log while the camera shows an empty door. A coin from a year that has not happened. No jump scares, no gore, no flashing. Dread arrives in the ledger.</p>
+      <p><strong>Two things to lose.</strong> Cash and nerve. Many choices spend one to save the other. Six endings, decided by the whole fortnight, never by a single choice.</p>
+      <ul><li>Ten regulars whose arcs drift across the nights</li><li>Forty-three authored beats, twenty table events, a line in the log each night that you did not write</li><li>Save per night: restart the night, never the fortnight</li><li>No ads, no accounts, no timers, fully offline</li><li>Portrait, one-handed, large-text and high-contrast options, no twitch input, no strobe</li></ul>
+    </section>
+    <footer>
+      <a href="privacy.html">Privacy policy</a>
+    </footer>
+  </main>
+  <script>
+    // Earlier versions of this site installed the game for offline play.
+    // Registering sw.js again replaces that copy with one that clears it.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        if (regs.length) navigator.serviceWorker.register('sw.js').catch(function () {});
+      }).catch(function () {});
+    }
+  </script>
+</body>
+</html>

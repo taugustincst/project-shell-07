@@ -9,12 +9,11 @@ const STRATS = {
   drifter: { event: () => 0, dark: 1, mop: s => s.wet && s.t === 2, rest: s => s.sanity < 30, w4: false, price: 0, lazy: true }
 };
 function play(name, seed) {
-  const S = STRATS[name]; const s = E.newState({ seed, unlocked: true }); E.setPrice(s, S.price);
+  const S = STRATS[name]; const s = E.newState({ seed }); E.setPrice(s, S.price);
   let guard = 0; const sanityByNight = [];
   while (!s.ended && guard++ < 5000) {
     if (s.pendingEvent) { if (s.pendingEvent.kind === 'dark') E.resolveDark(s, S.dark); else { const ch = E.eventChoices(s); E.resolveEvent(s, S.event(s, E.eventDef(s), ch)); } continue; }
     if (s.phase === 'ledger') { sanityByNight.push({ n: s.night, sanity: s.sanity, cash: s.cash }); E.nextNight(s); continue; }
-    if (s.phase === 'gate') { E.unlock(s); continue; }
     // free actions
     for (const m of s.machines) { if (m.state === 'done') E.unload(s, m.id); else if (m.state === 'jammed' && !S.lazy) E.fix(s, m.id); else if (m.state === 'broken' && s.cash > 40) E.repair(s, m.id); }
     if (!S.lazy || s.t % 2 === 0) while (s.queue.length) { const c = s.queue[0]; if (c.note && s.coins < 2) { if (!E.getChange(s)) { E.turnAway(s, 0); continue; } } const m = E.freeWasher(s, !S.w4); if (!m) break; if (!E.serve(s, 0, m.id)) break; }

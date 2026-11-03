@@ -33,7 +33,7 @@ Run the night shift. Follow the rules. The rules keep changing.
 Game · Simulation. Tags: horror, management, story, night shift, offline.
 
 ## Declarations (to confirm in Console)
-- IARC: horror themes and mild dread in text; no violence, gore, sexual content or gambling; no user interaction; no ads; one in-app purchase.
+- Price: paid download, suggested $4.99 (set in Play Console)
+- IARC: horror themes and mild dread in text; no violence, gore, sexual content or gambling; no user interaction; no ads; in-app purchases: none.
 - Target audience: 16-17 and 18+ only. Not for children.
-- Data safety: no data collected, no data shared. Privacy policy at this repo's Pages site, privacy.html. Contact elderon@augustinnovations.io.
-- In-app product: `full_unlock`, non-consumable, $4.99, title "Nights 4 to 14", description "Opens nights four to fourteen and every ending."
+- Data safety: no data collected, no data shared, no network access; progress stays on the device. Privacy policy at this repo's Pages site, privacy.html. Contact elderon@augustinnovations.io.

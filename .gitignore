@@ -3,3 +3,13 @@ android/keystore.properties
 *.keystore
 *.jks
 .DS_Store
+# Android Play edition: build output and the upload key, never committed
+android/*.aab
+android/*.apk
+android/build/
+android/.gradle/
+android/play/build/
+android/local.properties
+android/.idea/
+android/*.iml
+launch-test/
