@@ -33,7 +33,16 @@
 - [x] store/listing.md draft (features only, no price wording; 16+ audience)
 - [x] privacy.html
 - [ ] Final screenshots set and feature graphic (after tone gate and balance pass)
-- [ ] Android TWA wrapper (Ironhold pattern), package name FOR TJ
+- [x] Android Play edition (`android/play`, WebView), package `com.taugustincst.nightshift`
 
 ## Review
 Built the complete fortnight as data plus a deterministic engine. Verified locally: `node tests/engine.test.js` ALL 12 PASSED; `node sim/sim.js 200 1` diligent 100% survive (Dawn), greedy 0% (Spin Cycle ~night 9), drifter 100% (Closing Time); `node tests/smoke.js` ALL PASSED (20 checks, incl. three corrupt-save cases). Open: the human tone-gate test and the Android wrapper.
+
+## v1.1.0 (2026-11-09): free with one unlock, Folder's fix list
+- [x] Nights 1–3 free; `full_unlock` ($4.99, Play Billing 8) opens nights 4–14; gate after night three; a save never carries the unlock; 1.0 saves past night three wait
+- [x] getChange takes $10 (P1-1) with a test
+- [x] Every ending reachable in sim, gated in CI; careless play can lose (P1-2)
+- [x] Tone gate reader setup and questions in TONE-GATE.md (P1-3); [ ] the readers themselves (Taylor)
+- [x] Billing module replaced (P2-4); 34 minor events with night ranges (P2-5); 44px price chip and focus styles (P3-6)
+- [x] Smoke test with a fake Play bridge; emulator tap-through; launch on Android 9 and 14
+- [ ] Screenshots and feature graphic refresh (P3-7)

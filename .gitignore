@@ -13,3 +13,4 @@ android/local.properties
 android/.idea/
 android/*.iml
 launch-test/
+tap-through/

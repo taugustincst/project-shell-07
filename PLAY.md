@@ -1,32 +1,30 @@
 # Night Shift: Laundromat on Google Play
 
-Night Shift: Laundromat is sold on Google Play as a paid app, $4.99, with no in-app purchases. Nothing in the game is free to play: the whole game is inside the app, and the website is only its store page.
+Night Shift: Laundromat is free to install on Google Play. Nights one to three are free, with the first three rules and the first beats of every regular. One in-app purchase, the product `full_unlock` at $4.99, opens nights four to fourteen, the rest of the rules and the regulars' stories, and all six endings. There is nothing else to buy and no ads. The whole game is inside the app, and the website is only its store page.
 
-- **The app** is `android/play`: a full-screen WebView that opens the game from files packed inside the APK (`https://appassets.androidplatform.net/www/index.html`, served by AndroidX WebViewAssetLoader). It asks for no permissions, not even internet, and plays fully offline. The build copies the game's files (`index.html`, the styles, `js/`, `icons/` and the rest) into the app every time, so a game change ships with the next version.
+This replaces the 3 Nov plan of a $4.99 paid download (Taylor's "Free with paid unlock" decision).
+
+- **The app** is `android/play`: a full-screen WebView that opens the game from files packed inside the APK (`https://appassets.androidplatform.net/www/index.html`, served by AndroidX WebViewAssetLoader). It asks for no permission of its own, not even internet, and plays fully offline. The Play Billing library adds Play's billing permission, which only lets the app talk to the Play Store app on the phone. The build copies the game's files (`index.html`, the styles, `js/`, `icons/` and the rest) into the app every time, so a game change ships with the next version.
 - **Package**: `com.taugustincst.nightshift`
-- **Version**: 1.0.0 (versionCode 10000). The release workflow takes the version and works out the code (1.0.1 becomes 10001).
-- **Checks on every change** (`.github/workflows/android.yml`): builds the release APK and bundle, `tools/check-apk.js` confirms every class the manifest names and every file the game's page loads is in the app, and `tools/launch-test.sh` opens it on an Android 14 emulator and fails unless the game's page loads with no script errors.
+- **The unlock** is `android/play/.../PlayBilling.java` (Google Play Billing 8) and `js/billing.js`. The page asks Play for the price and whether `full_unlock` is owned, opens Play's purchase sheet, and acknowledges each purchase on the phone (Play refunds one that is not acknowledged within three days). Ownership is remembered on the phone so the game opens unlocked offline; a save file never carries it. There is no server. Outside the Play app (the website, a browser) the unlock is shown as unavailable.
+- **The free nights**: night three's ledger says it was the last free night, and its button reads "Night four". Tapping it opens the unlock sheet and the fortnight waits, saved, after night three; night three can be played again meanwhile. Buying begins night four with the same till and steadiness. A save from the 1.0 paid edition that is already past night three keeps its night and waits the same way, with the clock stopped, until Play says the unlock is owned.
+- **Version**: 1.1.0 (versionCode 10100). The release workflow takes the version and works out the code (1.0.1 becomes 10001).
+- **Checks on every change**: `.github/workflows/ci.yml` runs the engine tests, the balance check on two seed batches (every ending happens in play, careful play survives, drifting can lose) and the browser smoke test (with a stand-in for Play's billing bridge). `.github/workflows/android.yml` builds the release APK and bundle, `tools/check-apk.js` confirms every class the manifest names and every file the game's page loads is in the app, `tools/launch-test.sh` opens it on Android 9 and Android 14 emulators and fails unless the game's page loads with no script errors, and `tools/tap-through.js` plays with real taps on a debug build: night one's first beat, serving, a washer's sheet, mopping, the rule sheet, the camera and the entry log, the price chip, a setting, letting time pass, Back and a relaunch, and night three's ledger and unlock sheet.
 - **Signing**: the release workflow signs with the upload key from the repository's secrets; without them it builds and checks but publishes nothing. Locally, `android/keystore.properties` (never committed) does the same.
-- **The website** (`.github/workflows/pages.yml`) publishes only the store page (`site/index.html`, built from `store/listing.md`), the privacy policy and the store graphics. It no longer publishes the game. Its `sw.js` clears the copy of the game that earlier versions of the site installed for offline play.
+- **The website** (`.github/workflows/pages.yml`) publishes only the store page (`site/index.html`, built from `store/listing.md`), the privacy policy and the store graphics.
 
 ## What is left, in order
 
 These need your accounts, so they are yours.
 
-1. **Create the app in the Play Console** with the package name `com.taugustincst.nightshift` (Play never lets it change once the first bundle is uploaded). Set it up as a **paid** app at $4.99. Play does not let a free app become paid later, so choose Paid before the first release. No in-app products.
-2. **Make an upload key, once, and keep it somewhere safe** (a password manager). On your own computer:
+1. **Create the app in the Play Console** with the package name `com.taugustincst.nightshift` (Play never lets it change once the first bundle is uploaded). Set it up as a **free** app. If you already created it as Paid for the 1.0 plan, change it to Free under Monetize > App pricing before the first release; Play does not let a free app go back to paid. Play needs a payments profile on the developer account before it lets you add an in-app product.
+2. **Give this repository the AugustInnovations upload key**, the same one your other games use. In this repository's Settings > Secrets and variables > Actions, add `ANDROID_UPLOAD_KEYSTORE` (the keystore as base64 text, `base64 -w0 upload.jks`), `ANDROID_UPLOAD_STORE_PASSWORD`, `ANDROID_UPLOAD_KEY_ALIAS` and `ANDROID_UPLOAD_KEY_PASSWORD`. Never commit the keystore or put its passwords in a file here. Without these four the release workflow builds and checks the bundle but signs nothing.
+3. **Build the bundle**: Actions > Release (Play bundle) > Run workflow, version `1.1.0`. It builds, checks that the game loads, and attaches `nightshift-1.1.0-play.aab` to a GitHub release named `play-v1.1.0`.
+4. **Upload it to Internal testing** and accept Play App Signing. Play only lets you create in-app products once a bundle that uses Play Billing has been uploaded.
+5. **Create the in-app product**: Monetize > Products > In-app products > Create product. Product ID `full_unlock` (exactly this; the app asks for it by name and the ID can never be reused), name "The whole fortnight", description "Nights four to fourteen, every rule on the sheet, the rest of the regulars' stories and all six endings. One purchase, nothing else to buy.", price $4.99. Activate it.
+6. **Test the purchase**: add your Google account under Settings > License testing, install from the internal testing link, finish night three and buy. A license tester is not charged. Then uninstall, reinstall and tap Restore purchase on the unlock sheet.
+7. **App content**: privacy policy `https://taugustincst.github.io/project-shell-07/privacy.html`; ads: none; in-app purchases: yes; data safety: no data collected or shared (the purchase is held by Google Play; check the form's in-app purchase questions as you go); content rating and target audience as written in `store/listing.md`.
+8. **Store listing**: title, short and full description from `store/listing.md`; icon `icons/icon-512.png`; feature graphic `store/feature-graphic-1024x500.png`; phone screenshots `store/screenshot-*.png` (1080 wide, in the listing's caption order).
+9. **Release.** A personal developer account made after November 2023 needs a closed test with at least 12 testers for 14 days before production. Then send the release for review. The tone check and playtest listed in `HANDOFF.md` come first.
 
-   ```
-   keytool -genkeypair -v -keystore upload.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000
-   base64 -w0 upload.jks
-   ```
-
-   In this repository's Settings > Secrets and variables > Actions, add `ANDROID_UPLOAD_KEYSTORE` (the base64 text), `ANDROID_UPLOAD_STORE_PASSWORD`, `ANDROID_UPLOAD_KEY_ALIAS` (`upload`) and `ANDROID_UPLOAD_KEY_PASSWORD`. Never commit the keystore or put its passwords in a file here.
-3. **Build the bundle**: Actions > Release (Play bundle) > Run workflow, version `1.0.0`. It builds, checks that the game loads, and attaches `nightshift-1.0.0-play.aab` to a GitHub release named `play-v1.0.0`.
-4. **Upload it to Internal testing** and accept Play App Signing. Install it from the testing link on a phone and play a little.
-5. **App content**: privacy policy `https://taugustincst.github.io/project-shell-07/privacy.html`; ads: none; data safety: no data collected or shared; content rating and target audience as written in `store/listing.md`.
-6. **Store listing**: title, short and full description from `store/listing.md`; icon `icons/icon-512.png`; feature graphic `store/feature-graphic-1024x500.png`; phone screenshots `store/screenshot-*.png` (1080 wide, in the listing's caption order).
-7. **Release.** A personal developer account made after November 2023 needs a closed test with at least 12 testers for 14 days before production. Then send the release for review. Fixes and playtests listed in `HANDOFF.md` come first.
-8. **The website changes the moment this is merged.** Merging turns the site into the store page, so the game stops being free to play there straight away. Its "Get it on Google Play" button links to `https://play.google.com/store/apps/details?id=com.taugustincst.nightshift`, which only works once the app is live.
-
-No digital asset links are needed: the app no longer opens the website.
+No digital asset links are needed: the app does not open the website.
