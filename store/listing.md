@@ -18,8 +18,9 @@ Run the night shift. Follow the rules. The rules keep changing.
 **Two things to lose.** Cash and nerve. Many choices spend one to save the other. Six endings, decided by the whole fortnight, never by a single choice.
 
 - Ten regulars whose arcs drift across the nights
-- Forty-three authored beats, twenty table events, a line in the log each night that you did not write
+- Forty-three authored beats, thirty-four table events, a line in the log each night that you did not write
 - Save per night: restart the night, never the fortnight
+- Nights one to three are free; one purchase opens the whole fortnight
 - No ads, no accounts, no timers, fully offline
 - Portrait, one-handed, large-text and high-contrast options, no twitch input, no strobe
 
@@ -33,7 +34,7 @@ Run the night shift. Follow the rules. The rules keep changing.
 Game · Simulation. Tags: horror, management, story, night shift, offline.
 
 ## Declarations (to confirm in Console)
-- Price: paid download, suggested $4.99 (set in Play Console)
-- IARC: horror themes and mild dread in text; no violence, gore, sexual content or gambling; no user interaction; no ads; in-app purchases: none.
+- Price: free to install. One in-app product, `full_unlock` "The whole fortnight", $4.99, opens nights four to fourteen (set in Play Console, see PLAY.md)
+- IARC: horror themes and mild dread in text; no violence, gore, sexual content or gambling; no user interaction; no ads; in-app purchases: yes (one, the full game).
 - Target audience: 16-17 and 18+ only. Not for children.
-- Data safety: no data collected, no data shared, no network access; progress stays on the device. Privacy policy at this repo's Pages site, privacy.html. Contact elderon@augustinnovations.io.
+- Data safety: no data collected or shared by the game; progress stays on the device. The purchase goes through Google Play, which holds it (check the form's in-app purchase questions). Privacy policy at this repo's Pages site, privacy.html. Contact elderon@augustinnovations.io.

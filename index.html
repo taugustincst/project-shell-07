@@ -67,6 +67,7 @@
 
 <div class="modal" id="modal-ledger" hidden role="dialog" aria-modal="true"><div class="sheet">
   <div class="sheet-k">Six in the morning</div><h2 id="ld-title"></h2><div class="ledger" id="ld-body"></div><p class="unwritten" id="ld-unwritten"></p>
+  <p class="note" id="ld-free" hidden>That was the last of the free nights. Nights four to fourteen are in the full game, and the fortnight waits for you here.</p>
   <div class="row-btns"><button class="btn primary" id="btn-next-night">Next night</button><button class="btn" id="btn-ledger-restart">Do this night again</button></div>
 </div></div>
 
@@ -77,14 +78,25 @@
 
 <div class="modal" id="modal-more" hidden role="dialog" aria-modal="true"><div class="sheet">
   <h2>More</h2>
+  <div class="card" id="unlock-card"></div>
   <label class="row"><input type="checkbox" id="opt-large"> Large text</label>
   <label class="row"><input type="checkbox" id="opt-contrast"> High contrast</label>
   <div class="row-btns"><button class="btn" id="btn-restart-night">Restart this night</button><button class="btn danger" id="btn-reset">Start the fortnight again</button></div>
-  <p class="muted small">Night Shift: Laundromat is a systems-horror management game. No ads, no accounts, fully offline. Progress is saved on this device at the start of each night. Version <span id="about-version"></span> · <a href="privacy.html">Privacy</a> · © AugustInnovations LLC</p>
+  <p class="muted small">Night Shift: Laundromat is a systems-horror management game. No ads and no accounts, and it plays offline. Nights one to three are free; the full game is one purchase through Google Play. Progress is saved on this device at the start of each night. Version <span id="about-version"></span> · <a href="privacy.html">Privacy</a> · © AugustInnovations LLC</p>
   <button class="btn" id="btn-more-close">Close</button>
 </div></div>
 
+<div class="modal" id="modal-unlock" hidden role="dialog" aria-modal="true" aria-labelledby="u-title"><div class="sheet">
+  <div class="sheet-k" id="u-sub">The full game</div><h2 id="u-title">The rest of the fortnight</h2>
+  <p>Nights one to three are free. The full game adds:</p>
+  <ul class="unlock-list"><li>Nights four to fourteen, with a new rule on the sheet every night</li><li>The rest of each regular's story: Mrs Okafor, Dale, the twins, Mr Hale, Bea and the woman in the blue coat</li><li>Ruth, who wrote the sheet, and what happened on the sixteenth</li><li>All six endings, chosen by how you kept the rules, the till and yourself</li></ul>
+  <p class="muted">One purchase through Google Play. No ads and nothing else to buy. Your fortnight carries on from where you left it.</p>
+  <p class="note" id="u-note" hidden></p>
+  <button class="btn primary" id="u-buy">Unlock the full game</button>
+  <div class="row-btns"><button class="btn" id="u-restore">Restore purchase</button><button class="btn" id="u-later">Not now</button></div>
+</div></div>
+
 <div id="toast" class="toast" hidden></div>
-<script src="js/data.js"></script><script src="js/engine.js"></script><script src="js/game.js"></script>
+<script src="js/data.js"></script><script src="js/engine.js"></script><script src="js/billing.js"></script><script src="js/game.js"></script>
 </body>
 </html>

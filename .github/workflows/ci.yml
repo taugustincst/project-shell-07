@@ -1,7 +1,6 @@
 name: CI
 on:
   push:
-    branches-ignore: [main]
   pull_request:
   workflow_call:
 permissions:
@@ -17,7 +16,10 @@ jobs:
         with:
           node-version: 22
       - run: node tests/engine.test.js
-      - run: node sim/sim.js 200 1
-      - run: npm install --no-audit --no-fund
+      - name: Balance check (every ending happens, careful play survives, drifting can lose)
+        run: |
+          node sim/sim.js check 7 100
+          node sim/sim.js check 1000 100
+      - run: npm ci --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
       - run: node tests/smoke.js

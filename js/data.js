@@ -2,7 +2,7 @@
 (function (root) {
 'use strict';
 
-const NIGHTS = 14, TICKS = 21, TICK_MIN = 20; // 23:00 + 21×20min = 06:00
+const NIGHTS = 14, TICKS = 21, TICK_MIN = 20, FREE_NIGHTS = 3; // 23:00 + 21×20min = 06:00
 const PRICES = [3, 4, 5];
 
 const MACHINES = [
@@ -183,7 +183,22 @@ const MINOR = [
   { id: 'rain', min: 1, w: 3, text: 'Rain, hard, on the car park. Nobody will come for an hour. The shop is warm and loud and yours.', choices: [{ label: 'Rest a while', eff: { sanity: 4 } }] },
   { id: 'drawer_up', min: 7, w: 3, text: 'The drawer is up. Not by a wash. By an odd amount, in coins, as if someone paid for something you do not sell.', choices: [{ label: 'Keep it', eff: { cash: 7, sanity: -3 } }, { label: 'Put it in the lost box', eff: { sanity: -1 } }] },
   { id: 'mangle', min: 9, w: 2, text: 'From the back room, the mangle. Turning. It is not plugged in; you unplugged it yourself.', choices: [{ label: 'Close the door', eff: { sanity: -4 } }, { label: 'Go and look', eff: { sanity: -8, cash: 10, log: 'Went and looked at the mangle. There was a ten-dollar note in the rollers, pressed flat, this year\'s.' } }] },
-  { id: 'okafor_bag', min: 8, w: 2, text: 'A bag of scrubs by Washer 1, Mrs Okafor\'s, blue, still damp. She has not been in tonight.', choices: [{ label: 'Dry them for her', eff: { power: -3, sanity: -2 } }, { label: 'Leave the bag', eff: { sanity: -1 } }] }
+  { id: 'okafor_bag', min: 8, w: 2, text: 'A bag of scrubs by Washer 1, Mrs Okafor\'s, blue, still damp. She has not been in tonight.', choices: [{ label: 'Dry them for her', eff: { power: -3, sanity: -2 } }, { label: 'Leave the bag', eff: { sanity: -1 } }] },
+  // added in 1.1: more of the quiet middle, so the table does not repeat by night seven. max = last night it can happen.
+  { id: 'tip', min: 1, max: 6, w: 3, text: 'One of the students comes back for a phone charger and leaves two dollars on the counter, "for the wait".', choices: [{ label: 'Thank them', eff: { cash: 2, sanity: 1 } }] },
+  { id: 'ovens', min: 1, max: 8, w: 2, text: 'The bakery across the car park lights its ovens early. The smell comes in under the door. Bread, and the start of a day.', choices: [{ label: 'Breathe it in', eff: { sanity: 3 } }] },
+  { id: 'soap_split', min: 1, w: 3, text: 'A box of soap has split open in the store cupboard. Blue powder over the shelf, the floor and the mop bucket.', choices: [{ label: 'Sweep up what you can', eff: { det: -2, sanity: -1 } }, { label: 'Use the rest wet', eff: { det: -1, wet: true } }] },
+  { id: 'wave', min: 2, max: 9, w: 3, text: 'Someone you served last night waves through the glass on their way past. You wave back. It helps more than it should.', choices: [{ label: 'Wave', eff: { sanity: 2 } }] },
+  { id: 'meter', min: 2, w: 3, text: 'The meter by the back door is ticking faster than it should. Something in here is drawing power.', choices: [{ label: 'Switch Dryer 3 off at the wall', eff: { dryerOff: 'D3', power: 3 } }, { label: 'Leave it', eff: { power: -4 } }] },
+  { id: 'coinbox', min: 2, w: 3, text: 'The coin box on Washer 2 has jammed full. Somebody has been feeding it metal washers, the hardware kind. There are a few real coins in among them.', choices: [{ label: 'Prise them out', eff: { coins: 3, sanity: -1 } }, { label: 'Leave it for the morning', eff: {} }] },
+  { id: 'payphone', min: 3, w: 3, text: 'The payphone by the door rings. You did not know it still worked.', choices: [{ label: 'Let it ring out', eff: { sanity: -2 } }, { label: 'Answer it', eff: { sanity: -4, log: 'Answered the payphone. Somebody breathing, and behind them the hum of a laundromat. This one.' } }] },
+  { id: 'sleeper', min: 4, w: 2, text: 'A man has fallen asleep in the plastic chair, coat buttoned to the chin. He has no washing.', choices: [{ label: 'Let him sleep', eff: { sanity: 1, log: 'Let a man sleep in the chair by Dryer 2. When I looked again the chair was empty, and warm.' } }, { label: 'Wake him and ask him to go', eff: { sanity: -2 } }] },
+  { id: 'warm', min: 4, w: 3, text: 'Dryer 1 is warm to the touch. It has not run since midnight.', choices: [{ label: 'Note it', eff: { sanity: -2 } }] },
+  { id: 'window', min: 5, w: 2, text: 'In the window, against the dark, the shop is reflected: the machines, the counter, you. In the window you are sitting down.', choices: [{ label: 'Look away', eff: { sanity: -3 } }] },
+  { id: 'drain', min: 6, w: 3, text: 'The floor drain gurgles, then backs up. Grey water spreads towards the counter, and then stops, and goes back down.', choices: [{ label: 'Throw the mat over it', eff: { wet: true, sanity: -1 } }] },
+  { id: 'handprint', min: 7, w: 3, text: 'On the inside of the glass door, at the height of a child, a handprint in condensation. The outside of the glass is dry.', choices: [{ label: 'Wipe it away', eff: { sanity: -2 } }, { label: 'Leave it', eff: { sanity: -3 } }] },
+  { id: 'names', min: 8, w: 3, text: 'The back-room radio again. Not a station this time: names, read slowly, one after another. The volume knob is already at zero.', choices: [{ label: 'Pull the plug', eff: { sanity: -3, power: 1 } }, { label: 'Listen for yours', eff: { sanity: -6 } }] },
+  { id: 'bus', min: 9, w: 2, text: 'The night bus stops outside and opens its doors and waits. Nobody gets off. Nobody gets on. After a long minute it pulls away with every seat taken.', choices: [{ label: 'Note it', eff: { sanity: -3 } }] }
 ];
 
 /* The line in the log you did not write, one per night. */
@@ -202,6 +217,6 @@ const ENDINGS = {
   closing: { title: 'Closing Time', text: 'Two weeks after your last night the laundromat closes. A notice on the door, apologies for the inconvenience, the nearest alternative is across town. You go past it once at eleven. The lights are off. The machines are running.' }
 };
 
-const DATA = { NIGHTS, TICKS, TICK_MIN, PRICES, MACHINES, RULES, REGULARS, SPINE, MINOR, UNWRITTEN, ENDINGS };
+const DATA = { NIGHTS, TICKS, TICK_MIN, FREE_NIGHTS, PRICES, MACHINES, RULES, REGULARS, SPINE, MINOR, UNWRITTEN, ENDINGS };
 if (typeof module !== 'undefined' && module.exports) module.exports = DATA; else root.LM_DATA = DATA;
 })(typeof window !== 'undefined' ? window : globalThis);
