@@ -46,3 +46,4 @@ Built the complete fortnight as data plus a deterministic engine. Verified local
 - [x] Billing module replaced (P2-4); 34 minor events with night ranges (P2-5); 44px price chip and focus styles (P3-6)
 - [x] Smoke test with a fake Play bridge; emulator tap-through; launch on Android 9 and 14
 - [x] Screenshots and feature graphic refresh (P3-7): tools/make-store-art.js + tools/make-feature-graphic.js
+- [x] Per-night minor-event tables (brief compliance, Folder's Nov 9 gap 5): MINOR_TABLES, within-night repeat damping, sim gates

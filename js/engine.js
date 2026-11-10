@@ -5,6 +5,7 @@ const D = (typeof LM_DATA !== 'undefined') ? LM_DATA : require('./data.js');
 const { NIGHTS, TICKS, PRICES } = D;
 const START_CASH = 40, START_SANITY = 100, POWER_PER_NIGHT = 60, OWNER_CUT = 42, DET_COST = 8, REPAIR_COST = 15;
 const WASH_TICKS = 2, DRY_TICKS = 2, WASHER_DRAW = 1, DRYER_DRAW = 2, DRYER_PRICE = 2, DET_PRICE = 1.5;
+const MINOR_REPEAT = 0.2; // weight left on a minor event already seen tonight
 const LOG_CAP = 400, LEFT_TICKS = 2, REFUND = 2, WALKOUT_FINE = 1, WALKOUT_FREE = 2;
 const cap = t => t.charAt(0).toUpperCase() + t.slice(1), money = n => '$' + (n % 1 ? n.toFixed(2) : n);
 const NAMES = ['a man in a parka', 'a woman with a sleeping toddler', 'two students', 'a taxi driver', 'a nurse in a coat over scrubs', 'an old man with a pram of bedding', 'a woman on the phone', 'a chef, still in whites', 'a boy with a duvet', 'a couple not speaking', 'a man with one shoe', 'a girl with a rucksack', 'a cleaner from the office block', 'a man in a dressing gown', 'a woman with a dog'];
@@ -17,7 +18,7 @@ function newState(opts) {
   opts = opts || {};
   const s = { v: 1, seed: (opts.seed | 0) || ((Date.now() ^ (Math.random() * 1e9)) | 0), night: 1, t: 0, phase: 'night',
     cash: START_CASH, sanity: START_SANITY, power: POWER_PER_NIGHT, det: 10, coins: 20, wet: true, price: 1,
-    machines: freshMachines(), queue: [], log: [], entries: [], camera: null, rules: {}, flags: {}, pendingEvent: null, fired: {}, lastMinor: -9, backroom: 0,
+    machines: freshMachines(), queue: [], log: [], entries: [], camera: null, rules: {}, flags: {}, pendingEvent: null, fired: {}, lastMinor: -9, minorTonight: {}, backroom: 0,
     moppedTonight: false, w4Broken: false, logBroken: false, dark: false, darkEvent: false,
     nightStart: { cash: START_CASH, sanity: START_SANITY }, ledgers: [], unlocked: !!opts.unlocked, gated: false, ended: null,
     stats: { served: 0, lost: 0, phantoms: 0, cycles: 0, rests: 0, mops: 0, jams: 0, moans: 0 } };
@@ -25,7 +26,7 @@ function newState(opts) {
   return s;
 }
 function beginNight(s) {
-  s.t = 0; s.phase = 'night'; s.power = POWER_PER_NIGHT; s.machines = freshMachines(); s.queue = []; s.entries = []; s.camera = null; s.pendingEvent = null; s.lastMinor = -9;
+  s.t = 0; s.phase = 'night'; s.power = POWER_PER_NIGHT; s.machines = freshMachines(); s.queue = []; s.entries = []; s.camera = null; s.pendingEvent = null; s.lastMinor = -9; s.minorTonight = {};
   s.backroom = 0; s.moppedTonight = false; s.w4Broken = false; s.logBroken = false; s.dark = false; s.darkEvent = false; s.wet = s.night === 1 || rand(s) < 0.35;
   s.nightStart = { cash: s.cash, sanity: s.sanity, lost: s.stats.lost }; s.closedEarly = false;
   fireSpine(s);
@@ -56,9 +57,11 @@ function fireMinor(s) {
   if (s.pendingEvent || s.backroom > 0) return;
   if (s.t - s.lastMinor < 3) return;
   if (rand(s) > 0.28) return;
-  const pool = D.MINOR.filter(e => e.min <= s.night && (!e.max || s.night <= e.max) && condOk(s, e.cond));
-  let total = 0; for (const e of pool) total += e.w; let r = rand(s) * total;
-  for (const e of pool) { r -= e.w; if (r <= 0) { s.pendingEvent = { kind: 'minor', id: e.id }; s.lastMinor = s.t; return; } }
+  const table = D.MINOR_TABLES[s.night] || {};
+  const pool = D.MINOR.filter(e => table[e.id] > 0 && condOk(s, e.cond));
+  const w = e => table[e.id] * (s.minorTonight[e.id] ? MINOR_REPEAT : 1); // something already seen tonight is far less likely to come round again
+  let total = 0; for (const e of pool) total += w(e); let r = rand(s) * total;
+  for (const e of pool) { r -= w(e); if (r <= 0) { s.pendingEvent = { kind: 'minor', id: e.id }; s.lastMinor = s.t; s.minorTonight[e.id] = 1; return; } }
 }
 function eventDef(s) { if (!s.pendingEvent) return null; const list = s.pendingEvent.kind === 'spine' ? D.SPINE : D.MINOR; return list.find(e => e.id === s.pendingEvent.id) || null; }
 function eventChoices(s) { const e = eventDef(s); return e ? e.choices.filter(c => condOk(s, c.cond)) : []; }
@@ -228,7 +231,8 @@ function sanitize(raw) {
   s.flags = {}; if (raw.flags && typeof raw.flags === 'object') for (const k in raw.flags) if (raw.flags[k]) s.flags[String(k).slice(0, 40)] = raw.flags[k] === true ? true : String(raw.flags[k]).slice(0, 40);
   s.fired = {}; if (raw.fired && typeof raw.fired === 'object') for (const k in raw.fired) if (D.SPINE.some(e => e.id === k)) s.fired[k] = 1;
   s.pendingEvent = null; if (raw.pendingEvent && typeof raw.pendingEvent === 'object') { const p = raw.pendingEvent; if (p.kind === 'dark') s.pendingEvent = { kind: 'dark' }; else if ((p.kind === 'spine' && D.SPINE.some(e => e.id === p.id)) || (p.kind === 'minor' && D.MINOR.some(e => e.id === p.id))) s.pendingEvent = { kind: p.kind, id: p.id }; }
-  s.lastMinor = Math.round(num(raw.lastMinor, -9, -9, TICKS)); s.backroom = Math.round(num(raw.backroom, 0, 0, 6));
+  s.lastMinor = Math.round(num(raw.lastMinor, -9, -9, TICKS));
+  s.minorTonight = {}; if (raw.minorTonight && typeof raw.minorTonight === 'object') for (const id in raw.minorTonight) if (D.MINOR.some(e => e.id === id) && raw.minorTonight[id]) s.minorTonight[id] = 1; s.backroom = Math.round(num(raw.backroom, 0, 0, 6));
   s.moppedTonight = raw.moppedTonight === true; s.w4Broken = raw.w4Broken === true; s.logBroken = raw.logBroken === true; s.dark = raw.dark === true; s.darkEvent = raw.darkEvent === true;
   s.nightStart = { cash: num(raw.nightStart && raw.nightStart.cash, s.cash, -1000, 1e6), sanity: num(raw.nightStart && raw.nightStart.sanity, s.sanity, 0, 100), lost: Math.round(num(raw.nightStart && raw.nightStart.lost, 0, 0, 1e6)) }; s.closedEarly = raw.closedEarly === true;
   s.ledgers = Array.isArray(raw.ledgers) ? raw.ledgers.filter(l => l && typeof l === 'object').slice(0, NIGHTS).map(l => ({ night: Math.round(num(l.night, 1, 1, NIGHTS)), cashDelta: num(l.cashDelta, 0, -1e6, 1e6), sanity: num(l.sanity, 0, 0, 100), broken: Array.isArray(l.broken) ? l.broken.map(Number).filter(n => n >= 1 && n <= NIGHTS) : [], served: Math.round(num(l.served, 0, 0, 1e6)), unwritten: String(l.unwritten || '').slice(0, 200) })) : [];
@@ -240,6 +244,6 @@ function sanitize(raw) {
   return s;
 }
 
-const ENGINE = { D, atGate, unlock, START_CASH, START_SANITY, POWER_PER_NIGHT, OWNER_CUT, DET_COST, REPAIR_COST, DET_PRICE, DRYER_PRICE, rand, clock, newState, beginNight, rulesSoFar, brokenCount, keptCount, eventDef, eventChoices, resolveEvent, resolveDark, serve, turnAway, unload, stop, fix, repair, restock, getChange, setPrice, readLog, checkCamera, mop, rest, wait, advance, endNight, nextNight, restartNight, finalEnding, score, sanitize, pushLog, machine, freeWasher, freeDryer };
+const ENGINE = { D, atGate, unlock, START_CASH, START_SANITY, POWER_PER_NIGHT, OWNER_CUT, DET_COST, REPAIR_COST, DET_PRICE, DRYER_PRICE, rand, clock, newState, beginNight, fireMinor, rulesSoFar, brokenCount, keptCount, eventDef, eventChoices, resolveEvent, resolveDark, serve, turnAway, unload, stop, fix, repair, restock, getChange, setPrice, readLog, checkCamera, mop, rest, wait, advance, endNight, nextNight, restartNight, finalEnding, score, sanitize, pushLog, machine, freeWasher, freeDryer };
 if (typeof module !== 'undefined' && module.exports) module.exports = ENGINE; else root.LM = ENGINE;
 })(typeof window !== 'undefined' ? window : globalThis);
