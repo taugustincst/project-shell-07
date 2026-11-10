@@ -32,7 +32,7 @@
 ## Store pack
 - [x] store/listing.md draft (features only, no price wording; 16+ audience)
 - [x] privacy.html
-- [ ] Final screenshots set and feature graphic (after tone gate and balance pass)
+- [x] Final screenshots set and feature graphic (redo if the tone gate changes the floor screen)
 - [x] Android Play edition (`android/play`, WebView), package `com.taugustincst.nightshift`
 
 ## Review
@@ -45,4 +45,4 @@ Built the complete fortnight as data plus a deterministic engine. Verified local
 - [x] Tone gate reader setup and questions in TONE-GATE.md (P1-3); [ ] the readers themselves (Taylor)
 - [x] Billing module replaced (P2-4); 34 minor events with night ranges (P2-5); 44px price chip and focus styles (P3-6)
 - [x] Smoke test with a fake Play bridge; emulator tap-through; launch on Android 9 and 14
-- [ ] Screenshots and feature graphic refresh (P3-7)
+- [x] Screenshots and feature graphic refresh (P3-7): tools/make-store-art.js + tools/make-feature-graphic.js
