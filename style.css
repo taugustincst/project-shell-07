@@ -53,3 +53,11 @@ button { font: inherit; color: inherit; } a { color: var(--accent); } h1, h2, h3
 .note { border: 1px solid var(--line); background: var(--panel-2); border-radius: 8px; padding: 8px 10px; font-size: 0.9rem; }
 .unlock-list { margin: 8px 0; padding-left: 1.2em; } .unlock-list li { margin: 6px 0; }
 .notice .btn { margin-top: 8px; display: block; }
+/* More from AugustInnovations (settings sheet only) */
+.more-card { margin-top: 14px; } .more-card h3 { font-size: 0.95rem; letter-spacing: 0.08em; }
+.more-list { list-style: none; margin: 8px 0 2px; padding: 0; display: grid; gap: 8px; }
+.more-row { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel-2); color: var(--ink); text-decoration: none; min-height: 48px; }
+.more-row:active { background: var(--bg); } .more-row:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.more-icon { width: 48px; height: 48px; border-radius: 11px; flex: none; }
+.more-text { display: flex; flex-direction: column; min-width: 0; } .more-title { font-size: 0.95rem; } .more-hook { font-size: .82rem; color: var(--muted); }
+.more-store { font-size: .7rem; text-transform: uppercase; letter-spacing: .15em; color: var(--accent); margin-top: 2px; }
