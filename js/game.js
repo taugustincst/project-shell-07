@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const E = window.LM, D = E.D;
-const VERSION = '1.1.0', SAVE_KEY = 'laundromat.v1', BACKUP_KEY = 'laundromat.v1.backup';
+const VERSION = '1.1.1', SAVE_KEY = 'laundromat.v1', BACKUP_KEY = 'laundromat.v1.backup';
 const $ = id => document.getElementById(id);
 let S = null, profile = null;
 const BILL = window.createBilling({ storageKey: 'nightshift.unlock', productId: 'full_unlock' });
@@ -134,6 +134,8 @@ function applySettings() { document.documentElement.classList.toggle('large', pr
 
 function init() {
   load(); applySettings(); $('about-version').textContent = VERSION;
+  // More from AugustInnovations sits in the settings sheet only, never on the floor, in an event or the morning ledger.
+  $('more-card').hidden = !(window.MoreGames && window.MoreGames.render($('more-list'), 'nightshift'));
   $('machines').addEventListener('click', e => { const b = e.target.closest('[data-id]'); if (b && !S.pendingEvent && S.phase === 'night' && S.backroom === 0) machineSheet(b.dataset.id); });
   $('queue').addEventListener('click', e => { const s = e.target.closest('[data-serve]'); if (s) return serveTop(+s.dataset.serve); const a = e.target.closest('[data-away]'); if (a) { E.turnAway(S, +a.dataset.away); save(); render(); } });
   $('btn-wait').addEventListener('click', () => { E.wait(S); if (S.phase === 'ledger' || S.phase === 'ended') save(); render(); });

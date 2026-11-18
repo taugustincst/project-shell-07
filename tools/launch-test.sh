@@ -22,7 +22,16 @@ adb install -r "$APK" || fail "the APK did not install"
 adb shell pm clear "$PKG" >/dev/null 2>&1 || true
 adb logcat -c
 adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
-sleep 15
+# Wait for the page rather than a fixed time: the first WebView start on a
+# cold emulator can take longer than any fixed sleep, and a fixed wait raced it.
+# Poll logcat every 2 s, for up to 60 s, until the page reports itself loaded
+# or the app crashes, hangs or fails to load; then settle 3 s, so an error the
+# page logs just after loading is still caught, and run the same checks.
+for _ in $(seq 1 30); do
+  sleep 2
+  adb logcat -d > "$OUT/logcat.txt"; grep -qE "NIGHTSHIFT_READY elements=|NIGHTSHIFT_LOAD_ERROR|FATAL EXCEPTION|ANR in $PKG" "$OUT/logcat.txt" && break
+done
+sleep 3
 adb exec-out screencap -p > "$OUT/after-launch.png" || true
 adb logcat -d > "$OUT/logcat.txt"
 adb shell dumpsys activity activities | grep -E "mResumedActivity|topResumedActivity" | tee "$OUT/resumed.txt" || true

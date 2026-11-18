@@ -24,6 +24,10 @@ const settle = p => T(p, () => { const K = window.__laundromat; while (K.state.p
   check('night one opens at eleven with the first beat', (await p.textContent('#hdr-clock')) === '23:00' && !(await p.isHidden('#modal-event')));
   await p.click('#ev-choices .btn'); await p.waitForTimeout(100);
   check('the opening beat resolves', await T(p, () => !window.__laundromat.state.pendingEvent));
+  check('no other games are shown on the floor or in a story beat', (await p.locator('#app .more-row, #modal-event .more-row, #modal-ledger .more-row, #modal-ending .more-row').count()) === 0);
+  await p.click('#btn-more'); await p.waitForSelector('#modal-more:not([hidden])');
+  { const rows = await p.$$eval('#more-list a', as => as.map(a => ({ href: a.href, t: a.textContent, target: a.target, img: a.querySelector('img').naturalWidth }))); check('the settings sheet lists the other live games with icon and Play link', await p.isVisible('#more-card') && rows.length >= 2 && rows.every(r => r.href.startsWith('https://play.google.com/store/apps/details?id=com.taugustincst.') && !r.href.endsWith('.nightshift') && r.target === '_blank' && r.img > 0 && !/[$£€]/.test(r.t)), JSON.stringify(rows.map(r => r.href.split('.').pop()))); }
+  await p.click('#btn-more-close'); await p.waitForSelector('#modal-more', { state: 'hidden' });
   await T(p, () => window.__laundromat.customer({ name: 'a man in a parka', det: true }));
   await p.click('[data-serve="0"]'); await p.waitForTimeout(100);
   check('serving a customer starts a washer and takes money', await T(p, () => { const s = window.__laundromat.state; return s.machines.some(m => m.state === 'running' && m.player) && s.cash > 40; }));
